@@ -1,0 +1,17 @@
+{
+  "name": "@mod-eat/api-types",
+  "main": "index.ts",
+  "version": "1.0.0",
+  "type": "module",
+  "private": true,
+  "devDependencies": {
+    "@types/bun": "latest",
+    "elysia": "^1.4.16"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "@elysiajs/eden": "^1.4.5"
+  }
+}
