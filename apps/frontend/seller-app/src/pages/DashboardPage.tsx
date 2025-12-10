@@ -2,9 +2,8 @@ import { useState, useEffect } from 'react';
 import { data, redirect, useNavigate  } from 'react-router-dom';
 import NavBar from '../components/NavBar';
 import OrderPage from '../components/OrderPage';
-import { api } from '@mod-eat/api-types';
+import { api, type OrderItem } from '@mod-eat/api-types';
 import { useRestaurantContext } from '../context/RestaurantContext';
-import type { OrderItem } from '../../../../backend/src/modules/order/order.module';
 
 interface webSocketOrderUpdate{
     type : string, 
@@ -138,7 +137,7 @@ export default function DashboardPage() {
                         //     onToggleStock={handleToggleStock}
                         //     onDeleteStock={handleDeleteStock}
                         // />
-                        <h1>Stock page</h1>
+                        <h1>Stock page coming soon</h1>
                     )}
 
                     {/* Content for 'จัดการเมนู' (Menu) Tab */}
@@ -151,7 +150,7 @@ export default function DashboardPage() {
                         //     onDeleteMenu={handleDeleteMenu}
                         //     onEditMenu={handleEditMenu}
                         // />
-                        <h1>menu</h1>
+                        <h1>menu coming soon</h1>
                     )}
 
                     {/* Content for 'สรุปยอดขาย' (Sales) Tab */}
@@ -159,7 +158,7 @@ export default function DashboardPage() {
                         // <SummaryPage
                         //     summary={summary}
                         // />
-                        <h1>summary</h1>
+                        <h1>summary coming soon</h1>
                     )}
 
                 </div>

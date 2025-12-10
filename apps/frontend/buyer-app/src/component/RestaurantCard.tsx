@@ -1,7 +1,8 @@
 import { useNavigate } from "react-router-dom"
+import { useCartContext } from "../context/CartContext";
 
 export default function RestaurantCard({restaurant} : {restaurant : any}){ 
-
+    const { setRestaurantId } = useCartContext();
     let navigate = useNavigate()
 
     //todo ฟังก์ชันเลือกสีของจุดสถานะ (Dot)
@@ -28,6 +29,7 @@ export default function RestaurantCard({restaurant} : {restaurant : any}){
     }
 
     const handleClick = () => {
+        setRestaurantId(restaurant.id)
         navigate('/menu', { 
             state : { restaurant }
         })

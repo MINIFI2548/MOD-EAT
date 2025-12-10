@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useCartContext } from "../context/CartContext";
+import { api } from "@mod-eat/api-types";
 
 export default function PaymentPage() {
   const navigate = useNavigate();
-  const { cart } = useCartContext();
-
+  const { cart, restaurantId } = useCartContext();
   // รับยอดรวมมาจากหน้าตะกร้า (ถ้าไม่มีให้ default เป็น 0)
   const totalPrice = () => { 
         let t = 0
@@ -33,7 +33,33 @@ export default function PaymentPage() {
     alert("ยืนยันการสั่งซื้อเรียบร้อย!");
     // navigate("/"); // กลับหน้าแรก หรือไปหน้า Success
     console.log(cart)
-  };
+
+    const orderItems = cart.map((item) => {
+    return {
+        menuId: item.id,
+        menuName: item.name,
+        price: item.price,
+        // ถ้ามีข้อมูล option ให้ใส่ ถ้าไม่มีให้ใส่ []
+        selectedOption: item.selectedOption || [], 
+        // ถ้ามีจำนวนให้ใส่ ถ้าไม่มีให้เป็น 1
+        quantity: item.quantity || 1, 
+        // ถ้ามี description ให้ใส่ ถ้าไม่มีให้เป็น string ว่าง ""
+        description: item.description || "" 
+      }
+    })
+    console.log(orderItems)
+    api.buyer.order.create.post({
+      
+        order : {
+          restaurantId : restaurantId, 
+          price : totalPrice(), 
+          orderItems : orderItems
+        }
+      
+    }).then((res) => {
+      console.log(res)
+    })
+  }
 
   return (
     <div className="bg-orange-50 min-h-screen flex flex-col pb-10">

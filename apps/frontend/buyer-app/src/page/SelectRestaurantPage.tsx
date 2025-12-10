@@ -1,15 +1,17 @@
 import { useState, useEffect } from 'react'
 import { api } from '@mod-eat/api-types'
 import RestaurantCard from '../component/RestaurantCard'
+import { useCartContext } from '../context/CartContext'
 export default function SelectRestaurantPage() { 
     const [restaurants, setRestaurants] = useState([])
-
     const callAPI = async () => { 
         api.buyer.restaurants.get()
         .then((res) => { 
             setRestaurants(res.data)
         })
     }
+
+
     useEffect(() => {
         callAPI()
     }, [])

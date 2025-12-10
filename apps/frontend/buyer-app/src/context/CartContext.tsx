@@ -1,9 +1,10 @@
-import {createContext, useState, useContext, type ReactNode} from "react";
+import {createContext, useState, useContext, type ReactNode, use} from "react";
 
 const CartContext = createContext<any | undefined>(undefined);
 
 export const CartProvider = ({ children }: {children : ReactNode}) => {
     const [cart, setCart] = useState([])
+    const [restaurantId, setRestaurantId] = useState(0) 
 
     const addToCart  = (menu) => { 
         setCart((prevCart) => {
@@ -47,7 +48,9 @@ export const CartProvider = ({ children }: {children : ReactNode}) => {
         cart, 
         addToCart,
         increaseQuantity, 
-        decreaseQuantity
+        decreaseQuantity,
+        restaurantId,
+        setRestaurantId
     }
     return (
         <CartContext.Provider value={contextValue}>

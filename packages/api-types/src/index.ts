@@ -1,4 +1,4 @@
-import type { AppSever } from "../../apps/backend/src/index"
+import type { AppSever } from "../../../apps/backend/src/index"
 import { treaty } from "@elysiajs/eden";
 
 export const api = treaty<AppSever>('localhost:3000', {
@@ -6,3 +6,5 @@ export const api = treaty<AppSever>('localhost:3000', {
         credentials: 'include'
     }
 })
+
+export * from './order.interface'

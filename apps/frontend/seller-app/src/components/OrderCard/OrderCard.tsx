@@ -56,7 +56,7 @@ export default function OrderCard ({order} : {order:OrderItem}) {
         <div className="flex justify-between items-start mb-3">
             <div>
                 <h3 className="text-lg font-bold text-gray-800">
-                    คำสั่งซื้อ #{order.itemId} | {order.menuName}
+                    คำสั่งซื้อ #{order.itemId} | {order.menuName} {order.quantity} จาน
                 </h3>
                 {/* <p className="text-sm text-gray-600">ลูกค้า: {'order.customer'}</p> */}
                 {/* <p className="text-sm text-gray-500">เวลา: {'order.time'}</p> */}
