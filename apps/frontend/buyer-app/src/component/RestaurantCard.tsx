@@ -38,7 +38,7 @@ export default function RestaurantCard({restaurant} : {restaurant : any}){
 
     return(
     <>
-        <div className="RestaurantCard w-full bg-white rounded-2xl p-4 flex items-center gap-4 shadow-sm border border-gray-100 hover:shadow-md transition-shadow duration-200 cursor-pointer"
+        <div className="RestaurantCard bg-white rounded-2xl p-4 flex items-center gap-4 shadow-sm border border-gray-100 hover:shadow-md transition-shadow duration-200 cursor-pointer ml-[2%] mr-[2%]"
         onClick={handleClick}>
             <div className="shrink-0">
                 <div className="w-16 h-16 rounded-xl bg-orange-50 overflow-hidden flex items-center justify-center">

@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --host",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview"
@@ -14,6 +14,7 @@
     "@mod-eat/api-types": "workspace:*",
     "@tailwindcss/vite": "^4.1.17",
     "elysia": "^1.4.16",
+    "qr-scanner": "^1.4.2",
     "react": "^19.2.1",
     "react-dom": "^19.2.0",
     "react-router": "^7.9.6",

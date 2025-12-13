@@ -1,17 +1,22 @@
-import {createContext, useState, useContext, type ReactNode, use} from "react";
+import type { OrderCart, MenuItem } from "@mod-eat/api-types";
+import {createContext, useState, useContext, type ReactNode, useEffect} from "react";
 
 const CartContext = createContext<any | undefined>(undefined);
 
 export const CartProvider = ({ children }: {children : ReactNode}) => {
-    const [cart, setCart] = useState([])
+    const [cart, setCart] = useState<OrderCart[]>(JSON.parse(localStorage.getItem('orderCart')) as OrderCart[] ?? [])
     const [restaurantId, setRestaurantId] = useState(0) 
 
-    const addToCart  = (menu) => { 
+    useEffect(() => { 
+        setCart([])
+    }, [restaurantId])
+
+    const addToCart  = (menu : MenuItem) => { 
         setCart((prevCart) => {
-            const existingItem = prevCart.find((item) => item.id === menu.id);
+            const existingItem = prevCart.find((item) => item.menuId === menu.menuId);
             if (existingItem) {
                 return prevCart.map((item) =>
-                item.id === menu.id ? { ...item, quantity: item.quantity + 1 } : item
+                item.menuId === menu.menuId ? { ...item, quantity: item.quantity + 1 } : item
                 );
             } else {
                 return [...prevCart, { ...menu, quantity: 1 }];
@@ -22,7 +27,7 @@ export const CartProvider = ({ children }: {children : ReactNode}) => {
     const increaseQuantity = (productId: any) => {
         setCart((prev) => 
             prev.map((item) => 
-                item.id === productId ? { ...item, quantity: item.quantity + 1 } : item
+                item.menuId === productId ? { ...item, quantity: item.quantity + 1 } : item
             )
         );
     };
@@ -31,7 +36,7 @@ export const CartProvider = ({ children }: {children : ReactNode}) => {
         const decreaseQuantity = (productId: any) => {
             setCart((prev) => 
                 prev.reduce((acc, item) => {
-                    if (item.id === productId) {
+                    if (item.menuId === productId) {
                         if (item.quantity > 1) {
                             acc.push({ ...item, quantity: item.quantity - 1 });
                         }

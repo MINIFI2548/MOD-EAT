@@ -7,6 +7,7 @@ import RestaurantMenuPage from './page/RestaurantMenuPage'
 import { CartProvider } from './context/CartContext'
 import CartPage from './page/CartPage'
 import PaymentPage from './page/PaymentPage'
+import OrderHistoryPage from './page/OrderHistoryPage'
 
 const router = createBrowserRouter([
 {
@@ -32,7 +33,10 @@ const router = createBrowserRouter([
       {
         path:'/',
         element:<SelectRestaurantPage />
-      },
+      },{
+        path:'/history', 
+        element:<OrderHistoryPage />
+      }
     ]
   },
 ])

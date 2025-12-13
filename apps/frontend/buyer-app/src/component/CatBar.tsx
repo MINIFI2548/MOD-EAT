@@ -9,7 +9,6 @@ export default function CartBar() {
         cart.map(item => { 
             t += (item.price * item.quantity)
         })
-        console.log(t)
         return t
     } 
     return(

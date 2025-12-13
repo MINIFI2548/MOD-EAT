@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate  } from 'react-router-dom';
-import { api } from  '../../../../../packages/api-types/index'
+
 import { useRestaurantContext } from '../context/RestaurantContext';
+import { api } from '@mod-eat/api-types';
  
 interface LoginResponse {
   loggedIn: boolean;

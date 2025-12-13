@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useCartContext } from "../context/CartContext";
+import type { Order, OrderItem } from "@mod-eat/api-types";
 
 export default function CartPage() {
   const navigate = useNavigate();   
@@ -7,7 +8,7 @@ export default function CartPage() {
 
   const totalPrice = () => { 
         let t = 0
-        cart.map(item => { 
+        cart.map((item : OrderItem) => { 
             t += (item.price * item.quantity)
         })
         console.log(t)
@@ -42,7 +43,7 @@ export default function CartPage() {
 
       {/* --- Content Section (รายการอาหาร - Mockup) --- */}
       <div className="flex flex-col gap-4 p-4">
-       {cart.map((item, index) => {
+       {cart.map((item : OrderItem, index : number) => {
         {/* --- Card 1 (Mockup) --- */}
         return <div key={index} className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 flex gap-4">
             {/* รูปภาพ */}
@@ -53,7 +54,7 @@ export default function CartPage() {
                     {/* รายละเอียด */}
                     <div className="flex-1 flex flex-col justify-between">
                         <div>
-                            <h3 className="text-gray-900 font-bold text-lg">{item.name}</h3>
+                            <h3 className="text-gray-900 font-bold text-lg">{item.menuName}</h3>
                             {/* <p className="text-gray-400 text-xs"> ตัวเลือกเพิ่มเติม </p>  */}
                         </div>
                         <div className="flex justify-between items-end mt-2">
@@ -61,9 +62,9 @@ export default function CartPage() {
                             
                             {/* ปุ่มเพิ่มลดจำนวน */}
                             <div className="flex items-center gap-3 bg-gray-100 rounded-lg p-1">
-                                <button onClick={() => decreaseQuantity(item.id)}className="w-6 h-6 bg-white rounded shadow-sm text-gray-600 flex items-center justify-center font-bold active:scale-90 transition">-</button>
+                                <button onClick={() => decreaseQuantity(item.menuId)}className="w-6 h-6 bg-white rounded shadow-sm text-gray-600 flex items-center justify-center font-bold active:scale-90 transition">-</button>
                                 <span className="font-bold text-gray-800 text-sm w-4 text-center">{item.quantity}</span>
-                                <button onClick={() => increaseQuantity(item.id)} className="w-6 h-6 bg-orange-500 rounded shadow-sm text-white flex items-center justify-center font-bold active:scale-90 transition">+</button>
+                                <button onClick={() => increaseQuantity(item.menuId)} className="w-6 h-6 bg-orange-500 rounded shadow-sm text-white flex items-center justify-center font-bold active:scale-90 transition">+</button>
                             </div>
                         </div>
                     </div>

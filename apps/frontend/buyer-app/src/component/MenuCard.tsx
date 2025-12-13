@@ -1,25 +1,26 @@
+import type { MenuItem } from "@mod-eat/api-types";
 import { useCartContext } from "../context/CartContext"
 
-export default function MenuCard({menu} : {menu : any}) { 
+export default function MenuCard({menu} : { menu : MenuItem}) { 
     const {addToCart} = useCartContext();
     const handleOrdering = () => {
+        console.log("New Menu to Cart :")
         console.log(menu)
         addToCart(menu)
     }
 
     return(
-        <>
-            <div className="bg-white rounded-xl p-3 flex items-center justify-between shadow-sm border border-orange-50">
+            <div className="bg-white rounded-xl p-3 flex items-center justify-between shadow-sm border border-orange-50 ml-[2%} mr-[2]">
                 
                 <div className="flex items-center gap-4">
                 {/* รูปเมนู */}
                 <div className="w-16 h-16 bg-orange-50 rounded-lg shrink-0 overflow-hidden">
-                    <img src={menu?.picture_url ?? 'https://placehold.co/400x400'} alt={menu.name} className="w-full h-full object-cover" />
+                    <img src={menu?.pictureUrl ?? 'https://placehold.co/400x400'} alt={menu.menuName} className="w-full h-full object-cover" />
                 </div>
                 
                 {/* ชื่อและราคา */}
                 <div>
-                    <h3 className="text-gray-800 font-bold text-base">{menu.name}</h3>
+                    <h3 className="text-gray-800 font-bold text-base">{menu.menuName}</h3>
                     <p className="text-orange-600 font-bold mt-1">{menu.price} บาท</p>
                 </div>
                 </div>
@@ -32,6 +33,5 @@ export default function MenuCard({menu} : {menu : any}) {
                 </button>
 
             </div>
-        </>
     )
 }
