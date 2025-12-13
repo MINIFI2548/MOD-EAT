@@ -64,7 +64,7 @@ export default function RestaurantCard({restaurant} : {restaurant : any}){
                 </p>
             </div>
             {/* ส่วนสถานะคิว (ขวามือ) */}
-            <div className="flex flex-col items-end w-20">
+            <div className="flex flex-col items-end w-50">
                 <div className="flex items-center gap-2 mb-1">
                 {/* จุดสีแสดงสถานะ */}
                 <span className={`w-3 h-3 rounded-full ${getStatusColorClass()}`}></span>
