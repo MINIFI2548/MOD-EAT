@@ -6,7 +6,7 @@ import { useCartContext } from '../context/CartContext';
 
 export default function RestaurantMenuPage() { 
     //- cart begin 
-    const { cart } = useCartContext();
+    const { cart, setRestaurantId, setResPayment, restaurantId, restPayment} = useCartContext();
 
     // update cart on local store
     useEffect(()=> {
@@ -18,11 +18,14 @@ export default function RestaurantMenuPage() {
     //- cart end
     const { state } = useLocation();
     const restaurant = state?.restaurant;
-    // console.log(restaurant)
-
+    setRestaurantId(restaurant.id)
+    setResPayment(restaurant.promptpay)
+    
     const navigate = useNavigate()
     // log cart 
     useEffect(() => { 
+        console.log(restaurantId)
+        console.log(restPayment)
         console.log('Cart : ')
         console.log(cart)
     }, [cart])

@@ -1,4 +1,4 @@
-import type { OrderItem } from "../../../../backend/src/modules/order/order.module"
+import type { OrderItem } from "@mod-eat/api-types"
 import OrderCard from "./OrderCard/OrderCard"
 export default function OrderPage({queue} : {queue : OrderItem[]}) {
 

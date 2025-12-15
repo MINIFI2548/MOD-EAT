@@ -8,14 +8,17 @@ import { CartProvider } from './context/CartContext'
 import CartPage from './page/CartPage'
 import PaymentPage from './page/PaymentPage'
 import OrderHistoryPage from './page/OrderHistoryPage'
+import { WebSocketProvider } from './context/WebSocketContext'
 
 const router = createBrowserRouter([
 {
     path: '/',
     element: (
-      <CartProvider>
-        <Outlet />
-      </CartProvider>
+      <WebSocketProvider >
+        <CartProvider>
+          <Outlet />
+        </CartProvider>
+      </WebSocketProvider>
     ),
     children: [
       {

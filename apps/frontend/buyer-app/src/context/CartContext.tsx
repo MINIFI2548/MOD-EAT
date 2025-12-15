@@ -1,11 +1,12 @@
 import type { OrderCart, MenuItem } from "@mod-eat/api-types";
-import {createContext, useState, useContext, type ReactNode, useEffect} from "react";
+import {createContext, useState, useContext, type ReactNode, useEffect, use} from "react";
 
 const CartContext = createContext<any | undefined>(undefined);
 
 export const CartProvider = ({ children }: {children : ReactNode}) => {
-    const [cart, setCart] = useState<OrderCart[]>(JSON.parse(localStorage.getItem('orderCart')) as OrderCart[] ?? [])
-    const [restaurantId, setRestaurantId] = useState(0) 
+    const [cart, setCart] = useState<OrderCart[]>(JSON.parse(localStorage.getItem('orderCart') ?? '[]' ))
+    const [restaurantId, setRestaurantId] = useState(0)
+    const [restPayment, setResPayment] = useState('') 
 
     useEffect(() => { 
         setCart([])
@@ -55,7 +56,9 @@ export const CartProvider = ({ children }: {children : ReactNode}) => {
         increaseQuantity, 
         decreaseQuantity,
         restaurantId,
-        setRestaurantId
+        setRestaurantId, 
+        restPayment,
+        setResPayment
     }
     return (
         <CartContext.Provider value={contextValue}>

@@ -11,7 +11,7 @@ interface createdOrder {
 
 export default function PaymentPage() {
     const navigate = useNavigate();
-    const { cart, restaurantId } = useCartContext();
+    const { cart, restaurantId, restPayment } = useCartContext();
     // รับยอดรวมมาจากหน้าตะกร้า (ถ้าไม่มีให้ default เป็น 0)
     const totalPrice = () => { 
           let t = 0
@@ -133,7 +133,8 @@ export default function PaymentPage() {
                 {/* QR Mockup */}
                 <div className="bg-white p-2 border border-gray-100 rounded-lg shadow-inner mb-4">
                     <img 
-                        src="https://placehold.co/200x200?text=QR+Code" 
+                        // src="https://placehold.co/200x200?text=QR+Code" 
+                        src={`https://promptpay.io/${restPayment}/${totalPrice()}`} 
                         alt="QR Code" 
                         className="w-48 h-48 object-contain"
                     />

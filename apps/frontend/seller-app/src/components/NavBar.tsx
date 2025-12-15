@@ -23,8 +23,8 @@ export default function NavBar({ activeTab, onNavClick }) {
 
     const tabs = [
         { key: 'orders', icon: '🍽️', label: 'คำสั่งซื้อ' },
-        { key: 'stock', icon: '📦', label: 'จัดการสต็อก' },
         { key: 'menu', icon: '📋', label: 'จัดการเมนู' },
+        { key: 'stock', icon: '📦', label: 'จัดการสต็อก' },
         { key: 'sales', icon: '📈', label: 'สรุปยอดขาย' },
     ];
 

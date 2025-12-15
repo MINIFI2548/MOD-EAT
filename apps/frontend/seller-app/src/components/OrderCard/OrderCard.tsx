@@ -1,8 +1,12 @@
-import type { OrderItem } from "../../../../../backend/src/modules/order/order.module";
+import { api, type Order, type OrderItem } from "@mod-eat/api-types";
+import { useEffect, useState } from "react";
 
 export default function OrderCard ({order} : {order:OrderItem}) {  
     // Function เพื่อกำหนดป้ายกำกับและสถานะถัดไปตามสถานะปัจจุบัน
-    const getNextStatusAndLabel = (currentStatus) => {
+    // console.log(order)
+    const [currentStatus, setCurrentStatus] = useState(order.status);
+
+    const getNextStatusAndLabel = () => {
         if (currentStatus === 'ordered') {
             return {
                 label: '✓ ยืนยันรับออเดอร์',
@@ -16,20 +20,32 @@ export default function OrderCard ({order} : {order:OrderItem}) {
                 buttonClasses: 'bg-green-500 hover:bg-green-600'
             };
         } else if (currentStatus === 'cooked') {
-            // This is the step that clears the order from the view
+            // เมื่ออาหารเสร็จแล้ว ขั้นตอนถัดไปคือการส่งมอบให้ลูกค้า หรือจบออเดอร์
+            return {
+                label: 'ส่งมอบแล้ว / จบงาน',
+                nextStatus: 'received', // สถานะนี้มักใช้เพื่อเคลียร์ออเดอร์ออกจากหน้าจอครัว
+                buttonClasses: 'bg-gray-600 hover:bg-gray-700'
+            };
         }
-        // Default case
-        return { label: 'ไม่มีการดำเนินการ', nextStatus: '', buttonClasses: 'bg-gray-400 cursor-not-allowed' };
+
+        // Default case (สำหรับสถานะ received, cancel หรืออื่นๆ)
+        return {
+            label: 'ไม่มีการดำเนินการ',
+            nextStatus: '',
+            buttonClasses: 'bg-gray-300 cursor-not-allowed text-gray-500'
+        };
     };
 
     // Function เพื่อกำหนดคลาส CSS ตามสถานะของออเดอร์
-    const getStatusClasses = (status) => {
-        if (status === 'ordered') {
+    const getStatusClasses = () => {
+        if (currentStatus === 'ordered') {
             return 'bg-red-100 text-red-600';      // รอยืนยัน (Pending)
-        } else if (status === 'cooking') {
+        } else if (currentStatus === 'cooking') {
             return 'bg-yellow-100 text-yellow-700'; // กำลังทำ (Cooking)
-        } else if (status === 'finished') {
+        } else if (currentStatus === 'cooked') {
             return 'bg-green-100 text-green-700';    // เสร็จแล้ว (Finished)
+        }else if (currentStatus === 'received' || currentStatus === 'cancel') {
+            return 'bg-green-100 text-black-700';    // เสร็จแล้ว (Finished)
         }
         return 'bg-gray-100 text-gray-700';
     };
@@ -43,10 +59,26 @@ export default function OrderCard ({order} : {order:OrderItem}) {
     };
     
     const onOrderAction = () =>{
+        console.log(currentStatus)
+        
+        if(currentStatus == 'ordered'){
+            setCurrentStatus("cooking")
+        }else if(currentStatus == 'cooking'){
+            setCurrentStatus("cooked")
+        }else if(currentStatus == 'cooked'){
+            setCurrentStatus("received")
+        }
 
+        order.status = currentStatus
+        console.log(currentStatus)
+        api.seller.dashboard.orderStatus.post({
+            orderId : order.orderId as number, 
+            orderItemId : order.itemId as string, 
+            status: nextStatus as string
+        }).then(({data}) => console.log(data?.query))
     }
 
-    const { label, nextStatus, buttonClasses } = getNextStatusAndLabel(order.status);
+    const { label, nextStatus, buttonClasses } = getNextStatusAndLabel();
 
     return <>
     <div
@@ -63,7 +95,7 @@ export default function OrderCard ({order} : {order:OrderItem}) {
             </div>
 
             {/* Status Label */}
-            <span className={`OrderSatus px-3 py-1 text-sm font-medium rounded-full ${getStatusClasses(order.status)}`}>
+            <span className={`OrderSatus px-3 py-1 text-sm font-medium rounded-full ${getStatusClasses()}`}>
                 {order.status === 'ordered' ? 'รอยืนยัน' : order.status === 'cooking' ? 'กำลังทำ' : 'เสร็จแล้ว'}
             </span>
         </div>
@@ -87,7 +119,7 @@ export default function OrderCard ({order} : {order:OrderItem}) {
 
             {/* Action Button */}
             <button
-                onClick={() => onOrderAction(order)}
+                onClick={() => onOrderAction()}
                 // Disable button if no valid next action is defined
                 disabled={!nextStatus}
                 className={`px-4 py-2 text-white text-sm font-medium rounded-lg ${buttonClasses}`}

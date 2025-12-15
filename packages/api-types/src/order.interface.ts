@@ -18,6 +18,7 @@ export interface OrderCart{
 }
 
 export interface OrderItem{ 
+    orderId?:number, 
     menuId:number, 
     menuName:string, 
     itemId?: string,

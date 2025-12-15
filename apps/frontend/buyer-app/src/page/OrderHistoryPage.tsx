@@ -2,6 +2,7 @@ import OrderHistoryCard from "../component/OrderHistoryCard";
 import { api, type OrderItem } from "@mod-eat/api-types"
 import { useEffect, useState } from "react"
 import { useNavigate } from "react-router";
+import { useWebSocket } from "../context/WebSocketContext";
 
 // Icon ลูกศรย้อนกลับ (ใช้ SVG หรือ Icon library ที่คุณมี)
 const ChevronLeftIcon = () => (
@@ -14,18 +15,34 @@ export default function OrderHistoryPage() {
     
     const [history, setHistory] = useState<OrderItem[]>(JSON.parse(localStorage?.getItem('historyOrder') ?? '[]'))
     const navigate = useNavigate()
+
+    const { socket } = useWebSocket()
+    
+    socket?.subscribe((({data} : { data : any}) => {
+        console.log(data)
+        const mergedHistory = history.map((historyItem) => {
+        const matchingStatus = data.find((s : any) => s.itemId === historyItem.itemId)
+            return {
+                ...historyItem,
+                status: matchingStatus ? matchingStatus.status : historyItem.status
+            }
+        })
+        setHistory(mergedHistory)
+        console.log(history)
+    }))
+    
     useEffect(()=>{
         setHistory(JSON.parse(localStorage?.getItem('historyOrder') ?? '[]'))
-        // วิธีดึง itemId ออกมา
-        const itemIds: string[] = history.map((item:OrderItem) => item.itemId).filter((id): id is string => id !== undefined);;
         console.log(history);
+        // วิธีดึง itemId ออกมา
+        const itemIds: string[] = history.map((item:OrderItem) => item.itemId).filter((id): id is string => id !== undefined);
         api.buyer.order.history.post({itemIds : itemIds})
         .then(({data}) => {
             console.log(data)
             if(data){
                 // todo fix type
                 setHistory(data as any)
-                localStorage.setItem('historyOrder', JSON.stringify(history))
+                localStorage.setItem('historyOrder', JSON.stringify(data))
                 console.log(history);
             }
         })

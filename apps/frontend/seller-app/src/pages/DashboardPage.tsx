@@ -4,6 +4,7 @@ import NavBar from '../components/NavBar';
 import OrderPage from '../components/OrderPage';
 import { api, type OrderItem } from '@mod-eat/api-types';
 import { useRestaurantContext } from '../context/RestaurantContext';
+import MenuPage from '../components/MenuPage';
 
 interface webSocketOrderUpdate{
     type : string, 
@@ -63,6 +64,7 @@ export default function DashboardPage() {
             }
         })
     }, [])
+
     useEffect(()=>{
         console.log(queue)
     }, [queue])
@@ -150,7 +152,7 @@ export default function DashboardPage() {
                         //     onDeleteMenu={handleDeleteMenu}
                         //     onEditMenu={handleEditMenu}
                         // />
-                        <h1>menu coming soon</h1>
+                        <MenuPage />
                     )}
 
                     {/* Content for 'สรุปยอดขาย' (Sales) Tab */}
