@@ -71,11 +71,11 @@ export default function OrderPage({ queue }: { queue: OrderItem[] }) {
 
             {/* Content Area */}
             {displayOrders.length > 0 ? (
-                // --- ส่วนที่แก้ไข: เปลี่ยนเป็น Grid ---
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                // แก้ไขบรรทัดนี้: เพิ่ม lg:gap-6 และอาจจะลดจำนวน column ใน xl ลงถ้ายังรู้สึกแน่น
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 lg:gap-6">
                     {displayOrders.map((order) => (
                         <div key={order.itemId} className="h-full">
-                            {/* Wrap div เพื่อให้ Card สูงเท่ากันในแถวเดียวกัน */}
+                             {/* ใช้ h-full เพื่อให้ div ที่หุ้มสูงเท่ากัน และ Card ข้างในจะยืดตาม */}
                             <OrderCard order={order} />
                         </div>
                     ))}
