@@ -1,8 +1,10 @@
 // components/OrderCard/OrderCard.tsx
-import type { OrderItem } from "@mod-eat/api-types";
+import { api, type OrderItem, type OrderStatus } from "@mod-eat/api-types";
 import { useRestaurantContext } from "../../context/RestaurantContext";
 import { format } from 'date-fns';
 import { th } from 'date-fns/locale';
+import { data } from "react-router";
+import { useState } from "react";
 
 // ฟังก์ชันช่วยแปลงสถานะเป็นภาษาไทยและสี (แยกออกมาเพื่อให้โค้ดอ่านง่าย)
 const getStatusBadge = (status: string) => {
@@ -17,16 +19,22 @@ const getStatusBadge = (status: string) => {
 };
 
 export default function OrderCard({ order }: { order: OrderItem }) {
-    const { updateOrderStatus } = useRestaurantContext();
+    const [currentStatus, setCurrentStatus] = useState(order.status);
 
     // ฟังก์ชันเปลี่ยนสถานะ (เหมือนเดิม)
-    const handleStatusChange = (newStatus: string) => {
+    const handleStatusChange = (newStatus: OrderStatus) => {
         // ... (Logic เดิมของคุณ ถ้ามี alert หรือ confirm ก็ใส่ไว้ที่นี่)
-        updateOrderStatus(order.itemId, newStatus);
+        // updateOrderStatus(order.itemId, newStatus);
+        setCurrentStatus(newStatus)
+        api.seller.dashboard.orderStatus.post({
+            orderId : order.orderId as number, 
+            orderItemId : order.itemId as string, 
+            status: newStatus as string
+        }).then(({data}) => console.log(data))
     };
     
     // todo จัดรูปแบบเวลา (ถ้า order.createdAt เป็น string ให้ระวัง error ตรงนี้ อาจต้อง new Date(order.createdAt))
-    // const timeString = order.createdAt ? format(new Date(order.createdAt), 'HH:mm', { locale: th }) : '-';
+    const timeString = order.createdAt ? format(new Date(order.createdAt), 'HH:mm', { locale: th }) : '-';
 
     return (
         <div className="bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden flex flex-col h-full">
@@ -42,6 +50,16 @@ export default function OrderCard({ order }: { order: OrderItem }) {
                     🕒 {timeString} น.
                 </div>
             </div> */}
+            <div className="bg-orange-50 px-4 py-3 flex justify-between items-center border-b border-orange-100">
+                <div className="flex items-center gap-2">
+                    <span className="bg-orange-500 text-white text-sm font-bold px-2.5 py-1 rounded-lg">
+                        Order :  {order.itemId}
+                    </span>
+                </div>
+                <div className="text-gray-500 text-sm flex items-center gap-1">
+                    🕒 {timeString} น.
+                </div>
+            </div>
 
             {/* --- ส่วนเนื้อหา: เมนู และ ตัวเลือก (ให้ยืดหยุ่นเต็มพื้นที่ที่เหลือ) --- */}
             <div className="p-4 grow flex flex-col justify-between">
@@ -72,15 +90,15 @@ export default function OrderCard({ order }: { order: OrderItem }) {
                 
                 {/* แสดงสถานะปัจจุบัน */}
                  <div className="mt-4 flex justify-end">
-                    {getStatusBadge(order.status!)}
+                    {getStatusBadge(currentStatus!)}
                 </div>
             </div>
 
             {/* --- ส่วนท้าย: ปุ่ม Action (เต็มความกว้าง) --- */}
-            {order.status !== 'received' && order.status !== 'cancel' && (
+            {currentStatus !== 'received' && currentStatus !== 'cancel' && (
                 <div className="border-t border-gray-100 bg-gray-50 p-2 flex gap-2">
                      {/* ปุ่มสำหรับสถานะ 'ordered' -> ไป 'cooking' */}
-                    {order.status === 'ordered' && (
+                    {currentStatus === 'ordered' && (
                         <button 
                             onClick={() => handleStatusChange('cooking')}
                             className="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 rounded-lg font-bold text-sm transition-colors flex justify-center items-center gap-1"
@@ -90,7 +108,7 @@ export default function OrderCard({ order }: { order: OrderItem }) {
                     )}
                     
                      {/* ปุ่มสำหรับสถานะ 'cooking' -> ไป 'cooked' */}
-                    {order.status === 'cooking' && (
+                    {currentStatus === 'cooking' && (
                         <button 
                             onClick={() => handleStatusChange('cooked')}
                             className="w-full bg-green-500 hover:bg-green-600 text-white py-2 rounded-lg font-bold text-sm transition-colors flex justify-center items-center gap-1"
@@ -100,7 +118,7 @@ export default function OrderCard({ order }: { order: OrderItem }) {
                     )}
 
                      {/* ปุ่มสำหรับสถานะ 'cooked' -> ไป 'received' (จบงาน) */}
-                     {order.status === 'cooked' && (
+                     {currentStatus === 'cooked' && (
                         <button 
                             onClick={() => handleStatusChange('received')}
                             className="w-full bg-orange-500 hover:bg-orange-600 text-white py-2 rounded-lg font-bold text-sm transition-colors flex justify-center items-center gap-1"

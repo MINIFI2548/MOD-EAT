@@ -36,7 +36,7 @@ export default function OrderPage({ queue }: { queue: OrderItem[] }) {
             {/* Header Section */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
                 <div>
-                    <h2 className="text-xl font-bold text-gray-800">จัดการคำสั่งซื้อ</h2>
+                    <h2 className="text-2xl font-bold text-gray-800">จัดการคำสั่งซื้อ</h2>
                     <p className="text-sm text-gray-500">
                         รายการรอทำ: <span className="text-orange-600 font-bold">{displayOrders.length}</span> รายการ
                     </p>
@@ -47,7 +47,7 @@ export default function OrderPage({ queue }: { queue: OrderItem[] }) {
                     <select
                         value={filterStatus}
                         onChange={(e) => setFilterStatus(e.target.value)}
-                        className="bg-white border border-gray-300 text-gray-700 text-sm rounded-lg focus:ring-orange-500 focus:border-orange-500 block p-2.5 focus:outline-none shadow-sm flex-1 md:flex-none"
+                        className="bg-white border border-gray-300 text-gray-700 text-sm rounded-lg focus:ring-orange-500 focus:border-orange-500 block px-3 py-2 focus:outline-none shadow-sm flex-1 md:flex-none cursor-pointer"
                     >
                         <option value="active">⚡ รายการที่ต้องทำ</option>
                         <option value="ordered">🟡 รอยืนยัน</option>
@@ -60,7 +60,7 @@ export default function OrderPage({ queue }: { queue: OrderItem[] }) {
                     <select
                         value={sortOrder}
                         onChange={(e) => setSortOrder(e.target.value)}
-                        className="bg-white border border-gray-300 text-gray-700 text-sm rounded-lg focus:ring-orange-500 focus:border-orange-500 block p-2.5 focus:outline-none shadow-sm flex-1 md:flex-none"
+                        className="bg-white border border-gray-300 text-gray-700 text-sm rounded-lg focus:ring-orange-500 focus:border-orange-500 block px-3 py-2 focus:outline-none shadow-sm flex-1 md:flex-none cursor-pointer"
                     >
                         <option value="oldest">🕒 มาก่อน-ได้ก่อน</option>
                         <option value="newest">🆕 มาใหม่ล่าสุด</option>
