@@ -3,6 +3,7 @@ import { api, type OrderItem } from "@mod-eat/api-types"
 import { useEffect, useState } from "react"
 import { useNavigate } from "react-router";
 import { useWebSocket } from "../context/WebSocketContext";
+import { useToast } from "../context/ToastContext";
 
 // Icon ลูกศรย้อนกลับ (ใช้ SVG หรือ Icon library ที่คุณมี)
 const ChevronLeftIcon = () => (
@@ -13,21 +14,43 @@ const ChevronLeftIcon = () => (
 
 export default function OrderHistoryPage() {
     
+    const { toast } = useToast()
+
     const [history, setHistory] = useState<OrderItem[]>(JSON.parse(localStorage?.getItem('historyOrder') ?? '[]'))
     const navigate = useNavigate()
 
-    const { socket } = useWebSocket()
+    const { socket, connecting } = useWebSocket()
     
+// ฟังก์ชันแปลสถานะเป็นภาษาไทย (เอาไว้โชว์ใน popup)
+    const getStatusText = (status: string) => {
+        switch(status) {
+            case 'cooking': return 'กำลังปรุง';
+            case 'cooked': return 'ปรุงเสร็จแล้ว';
+            case 'received': return 'เสิร์ฟแล้ว';
+            case 'cancel': return 'ถูกยกเลิก';
+            default: return status;
+        }
+    }
+
     socket?.subscribe((({data} : { data : any}) => {
-        console.log(data)
-        const mergedHistory = history.map((historyItem) => {
-        const matchingStatus = data.find((s : any) => s.itemId === historyItem.itemId)
-            return {
-                ...historyItem,
-                status: matchingStatus ? matchingStatus.status : historyItem.status
-            }
-        })
-        setHistory(mergedHistory)
+        setHistory((prevHistory) => { // ใช้ callback ใน setState เพื่อให้ได้ค่าล่าสุดเสมอ
+             return prevHistory.map((historyItem) => {
+                const matchingStatus = data.find((s : any) => s.itemId === historyItem.itemId);
+                
+                // ตรวจสอบว่ามีข้อมูลใหม่ และ สถานะ "เปลี่ยนไปจากเดิม" หรือไม่
+                if (matchingStatus && matchingStatus.status !== historyItem.status) {
+                    
+                    // --- แจ้งเตือนตรงนี้ ---
+                    const statusText = getStatusText(matchingStatus.status);
+                    toast.info(`เมนู "${historyItem.menuName}" สถานะเปลี่ยนเป็น: ${statusText}`);
+                    // --------------------
+
+                    return { ...historyItem, status: matchingStatus.status };
+                }
+                
+                return historyItem;
+            });
+        });
         console.log(history)
     }))
     
@@ -46,6 +69,7 @@ export default function OrderHistoryPage() {
                 console.log(history);
             }
         })
+        connecting()
     }, [])
 
     return (
@@ -57,7 +81,7 @@ export default function OrderHistoryPage() {
             {/* ปุ่ม Back */}
             <button 
             className="absolute left-0 bg-white/20 hover:bg-white/30 text-white px-3 py-1 rounded-full flex items-center gap-1 transition-colors cursor-pointer"
-            onClick={() => navigate(-1)}
+            onClick={() => navigate("/")}
             >
             <ChevronLeftIcon />
             <span className="text-sm font-medium">กลับ</span>
@@ -73,7 +97,7 @@ export default function OrderHistoryPage() {
         {/* --- Content Section --- */}
         <div className="flex flex-col gap-4 p-4">
             {
-                history?.map((orderItem : OrderItem, index) => {
+                [...history].reverse().map((orderItem : OrderItem, index) => {
                     return <OrderHistoryCard order={orderItem}  key={index} />
                 })
             }

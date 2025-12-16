@@ -9,18 +9,22 @@ export const WebSocketProvider = ({ children } : { children : ReactNode}) => {
     const [socket, setSocket] = useState<EdenWS<any> | null>(null);
     const [lastMessage, setLastMessage] = useState(null);
 
+    const connecting = () =>{
+      const history = JSON.parse(localStorage?.getItem('historyOrder') ?? '[]')
+      const oederIds: number[] = [...new Set(history.map((item:OrderItem) => item.orderId))];
+      const newSocket = api.buyer.orderTracker.subscribe({ query : { orderId : oederIds}})
+      
+      setSocket(newSocket);
+    }
+
     useEffect(() => {
-        const history = JSON.parse(localStorage?.getItem('historyOrder') ?? '[]')
-        const oederIds: number[] = [...new Set(history.map((item:OrderItem) => item.orderId))];
-        const newSocket = api.buyer.orderTracker.subscribe({ query : { orderId : oederIds}})
-        
-        setSocket(newSocket);
+      connecting()
 
     }, [])
 
 
     return (
-        <WebSocketContext.Provider value={{ socket, lastMessage }}>
+        <WebSocketContext.Provider value={{ connecting, socket, lastMessage }}>
             {children}
         </WebSocketContext.Provider>
     )

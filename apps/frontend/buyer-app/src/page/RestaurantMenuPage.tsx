@@ -1,39 +1,38 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react'; // เพิ่ม useState
 import { useLocation, useNavigate } from 'react-router-dom';
 import Menulist from '../component/Menulist';
 import CartBar from '../component/CatBar';
+import MenuDetailModal from '../component/MenuDetailModal'; // Import Modal มาที่นี่
 import { useCartContext } from '../context/CartContext';
+import type { MenuItem } from "@mod-eat/api-types"; // Import Type
 
 export default function RestaurantMenuPage() { 
-    //- cart begin 
     const { cart, setRestaurantId, setResPayment, restaurantId, restPayment} = useCartContext();
+    const [selectedMenu, setSelectedMenu] = useState<MenuItem | null>(null); // สร้าง State สำหรับ Modal ที่นี่
 
     // update cart on local store
     useEffect(()=> {
-        if(!cart){
-            return
-        }
+        if(!cart){ return }
         localStorage.setItem('orderCart', JSON.stringify(cart))
     }, [cart])
-    //- cart end
+
     const { state } = useLocation();
     const restaurant = state?.restaurant;
-    setRestaurantId(restaurant.id)
-    setResPayment(restaurant.promptpay)
+    
+    // เซ็ตค่า context แค่ครั้งแรก หรือเมื่อ restaurant เปลี่ยน
+    useEffect(() => {
+        if (restaurant) {
+            setRestaurantId(restaurant.id)
+            setResPayment(restaurant.promptpay)
+        }
+    }, [restaurant])
     
     const navigate = useNavigate()
-    // log cart 
-    useEffect(() => { 
-        console.log(restaurantId)
-        console.log(restPayment)
-        console.log('Cart : ')
-        console.log(cart)
-    }, [cart])
 
-    return (<>
-            {/* --- Header Section (สีส้ม) --- */}
+    return (
+        <>
+            {/* --- Header Section --- */}
             <div className="bg-linear-to-r from-orange-500 to-orange-400 text-white pt-6 pb-4 px-4 rounded-b-3xl shadow-md sticky top-0 z-10 flex items-center justify-center"> 
-                {/* ส่วนปุ่มกลับ: ใช้ absolute เพื่อให้ลอยอยู่ซ้ายสุดโดยไม่ดัน logo */}
                 <div className="absolute left-4">
                     <button 
                         onClick={() => navigate(-1)} 
@@ -44,7 +43,6 @@ export default function RestaurantMenuPage() {
                     </button>
                 </div>
 
-                {/* ส่วน Logo และ ชื่อร้าน: จะอยู่ตรงกลางจอพอดีเพราะ Parent ใช้ justify-center */}
                 <div className="flex justify-center items-center gap-4">
                     <div className="w-12 h-12 bg-white rounded-full p-1 shadow-inner shrink-0">
                         <img 
@@ -59,14 +57,27 @@ export default function RestaurantMenuPage() {
                         <p className="text-sm tracking-wide shadow-black drop-shadow-md">{restaurant.description}</p>
                     </div>
                 </div>
-
             </div>
         
             <div className="bg-orange-50 min-h-screen flex flex-col">
-                <Menulist restaurantId = {restaurant.id} />
+                {/* ส่ง function รับค่าคลิกไปที่ Menulist */}
+                <Menulist 
+                    restaurantId={restaurant.id} 
+                    onMenuClick={(menu) => setSelectedMenu(menu)}
+                />
             </div>
 
-            {cart?.length > 0 && (<CartBar />)} 
-             </>
+            {/* --- ส่วน Modal --- */}
+            {selectedMenu && (
+                <MenuDetailModal 
+                    menu={selectedMenu} 
+                    onClose={() => setSelectedMenu(null)} 
+                />
+            )}
+
+            {/* --- ส่วน CartBar --- */}
+            {/* แสดงเมื่อมีของในตะกร้า AND Modal ไม่ได้เปิดอยู่ (!selectedMenu) */}
+            {cart?.length > 0 && !selectedMenu && (<CartBar />)} 
+        </>
     )
 }

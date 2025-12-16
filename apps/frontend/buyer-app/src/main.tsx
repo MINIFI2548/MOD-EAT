@@ -9,6 +9,7 @@ import CartPage from './page/CartPage'
 import PaymentPage from './page/PaymentPage'
 import OrderHistoryPage from './page/OrderHistoryPage'
 import { WebSocketProvider } from './context/WebSocketContext'
+import { ToastProvider } from './context/ToastContext'
 
 const router = createBrowserRouter([
 {
@@ -46,6 +47,8 @@ const router = createBrowserRouter([
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <RouterProvider router={router} />  
+    <ToastProvider>
+    <RouterProvider router={router} /> 
+    </ToastProvider> 
   </StrictMode>,
 )

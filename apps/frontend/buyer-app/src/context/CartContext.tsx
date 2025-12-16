@@ -12,43 +12,68 @@ export const CartProvider = ({ children }: {children : ReactNode}) => {
         setCart([])
     }, [restaurantId])
 
-    const addToCart  = (menu : MenuItem) => { 
+    // Helper Function: สำหรับเปรียบเทียบว่า Option เหมือนกันเป๊ะหรือไม่
+    const isOptionsEqual = (opt1: any[], opt2: any[]) => {
+        // ใช้วิธีแปลงเป็น JSON String เพื่อเทียบ Object (ง่ายและเร็วสำหรับเคสนี้)
+        return JSON.stringify(opt1) === JSON.stringify(opt2);
+    }
+
+    const addToCart  = (newItem : any) => { 
         setCart((prevCart) => {
-            const existingItem = prevCart.find((item) => item.menuId === menu.menuId);
-            if (existingItem) {
-                return prevCart.map((item) =>
-                item.menuId === menu.menuId ? { ...item, quantity: item.quantity + 1 } : item
-                );
+            // ค้นหาว่ามี Item นี้อยู่แล้วหรือไม่ โดยเช็ค 3 อย่าง: id, description, options
+            const existingItemIndex = prevCart.findIndex((item) => 
+                item.menuId === newItem.menuId && 
+                item.description === newItem.description &&
+                isOptionsEqual(item.selectedOption!, newItem.selectedOption)
+            );
+
+            if (existingItemIndex > -1) {
+                // กรณี: เจอของที่เหมือนกันเป๊ะ -> บวกจำนวนเพิ่ม
+                const newCart = [...prevCart];
+                newCart[existingItemIndex].quantity += newItem.quantity;
+                return newCart;
             } else {
-                return [...prevCart, { ...menu, quantity: 1 }];
+                // กรณี: ไม่เจอ หรือ มีจุดต่างกัน -> เพิ่มเป็นแถวใหม่
+                return [...prevCart, newItem];
             }  
         })
     }
 
-    const increaseQuantity = (productId: any) => {
-        setCart((prev) => 
-            prev.map((item) => 
-                item.menuId === productId ? { ...item, quantity: item.quantity + 1 } : item
-            )
-        );
+    // ... (logic increase/decrease quantity ก็ต้องเช็ค index แทน menuId)
+    // หมายเหตุ: increaseQuantity/decreaseQuantity เดิมใช้ menuId ซึ่งตอนนี้จะไม่เวิร์คแล้วถ้ามีเมนูซ้ำกันหลายแถว
+    // **แนะนำให้เปลี่ยน logic ใน CartPage ให้ส่ง Index มาลบ หรือส่งทั้ง Object มาเทียบครับ**
+    // เพื่อความง่าย ผมขอแก้ increase/decrease ให้รับเป็น index ของ Array แทนครับ
+
+    const increaseQuantity = (index: number) => {
+        setCart((prev) => {
+            const newCart = [...prev];
+            newCart[index].quantity += 1;
+            return newCart;
+        });
     };
 
-    // [เพิ่มใหม่] ฟังก์ชันลดจำนวน (ถ้าเหลือ 0 ให้ลบออก)
-        const decreaseQuantity = (productId: any) => {
-            setCart((prev) => 
-                prev.reduce((acc, item) => {
-                    if (item.menuId === productId) {
-                        if (item.quantity > 1) {
-                            acc.push({ ...item, quantity: item.quantity - 1 });
-                        }
-                        // ถ้าเหลือ 1 แล้วกดลบ ก็ไม่ต้อง push เข้า acc (คือลบออกไปเลย)
-                    } else {
-                        acc.push(item);
-                    }
-                    return acc;
-                }, [] as any[])
-            );
-        };
+    const decreaseQuantity = (index: number) => {
+        setCart((prev) => {
+            const newCart = [...prev];
+            if (newCart[index].quantity > 1) {
+                newCart[index].quantity -= 1;
+            } else {
+                newCart.splice(index, 1); // ลบออกจาก Array
+            }
+            return newCart;
+        });
+    };
+    // ฟังก์ชันสำหรับแก้ไข Item โดยระบุ Index
+    // แก้ไข updateCartItem ให้รองรับ Logic เดียวกัน (ถ้าแก้แล้วไปซ้ำกับอันอื่นควรรวมกัน หรือ update ทับเฉยๆ ก็ได้)
+    // แต่เบื้องต้น update ทับ index เดิมไปก่อนตาม Code ก่อนหน้า
+    const updateCartItem = (index: number, updatedItem: any) => {
+        setCart((prev) => {
+            const newCart = [...prev];
+            newCart[index] = updatedItem;
+            return newCart;
+        });
+    };
+    
 
     const contextValue = { 
         cart, 
@@ -58,7 +83,8 @@ export const CartProvider = ({ children }: {children : ReactNode}) => {
         restaurantId,
         setRestaurantId, 
         restPayment,
-        setResPayment
+        setResPayment,
+        updateCartItem
     }
     return (
         <CartContext.Provider value={contextValue}>

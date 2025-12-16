@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useCartContext } from "../context/CartContext";
 import { api, type OrderCart, type OrderItem } from "@mod-eat/api-types";
 import QrScanner from 'qr-scanner';
+import { useToast } from "../context/ToastContext";
 
 interface createdOrder { 
   status : string,
@@ -12,6 +13,7 @@ interface createdOrder {
 export default function PaymentPage() {
     const navigate = useNavigate();
     const { cart, restaurantId, restPayment } = useCartContext();
+    const { toast } = useToast();
     // รับยอดรวมมาจากหน้าตะกร้า (ถ้าไม่มีให้ default เป็น 0)
     const totalPrice = () => { 
           let t = 0
@@ -23,7 +25,7 @@ export default function PaymentPage() {
 
     const [selectedFile, setSelectedFile] = useState<File | null>(null)
     const [qrCode, SetQrCode] = useState<string>('')
-
+    const qrUrl = `https://promptpay.io/${restPayment}/${totalPrice()}`;
     const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files && event.target.files[0]// ดึงข้อมูลจากรูปที่อัปมาก่อน 
         if (file){ 
@@ -92,16 +94,45 @@ export default function PaymentPage() {
           console.log("history : ")
           console.log(history)
           localStorage.setItem('historyOrder', JSON.stringify(history))
+          toast.success("สั่งซื้อสำเร็จ!")
           navigate('/history')
         })
         // TODO: ส่งข้อมูลไป Backend
-        alert("ยืนยันการสั่งซื้อเรียบร้อย!");
+        // alert("ยืนยันการสั่งซื้อเรียบร้อย!");
         }catch(err){
           console.log(err)
           alert(err)
           
         }
       }
+
+      const handleDownloadQR = async () => {
+        try {
+            // 1. ดึงข้อมูลรูปภาพมาเป็น Blob (Binary Large Object)
+            const response = await fetch(qrUrl);
+            const blob = await response.blob();
+            
+            // 2. สร้าง URL ชั่วคราวจาก Blob
+            const blobUrl = window.URL.createObjectURL(blob);
+            
+            // 3. สร้าง element <a> จำลองเพื่อสั่งกดดาวน์โหลด
+            const link = document.createElement('a');
+            link.href = blobUrl;
+            link.download = `QR-${restPayment}-${totalPrice()}.png`; // ตั้งชื่อไฟล์ที่นี่
+            document.body.appendChild(link);
+            
+            // 4. สั่งกดและลบ element ทิ้ง
+            link.click();
+            document.body.removeChild(link);
+            
+            // 5. คืน memory
+            window.URL.revokeObjectURL(blobUrl);
+            
+        } catch (error) {
+            console.error("Download failed:", error);
+            alert("ไม่สามารถดาวน์โหลดได้ กรุณากดค้างที่รูปภาพเพื่อบันทึก");
+        }
+    };
 
       return (
         <div className="bg-orange-50 min-h-screen flex flex-col pb-10">
@@ -127,27 +158,33 @@ export default function PaymentPage() {
           <div className="flex flex-col gap-4 p-4 max-w-md mx-auto w-full">
             
             {/* --- Card 1: QR Code Section --- */}
-            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 flex flex-col items-center text-center">
-                <h2 className="text-gray-900 font-bold text-lg mb-4">ชำระเงินผ่าน QR Code</h2>
-                
-                {/* QR Mockup */}
-                <div className="bg-white p-2 border border-gray-100 rounded-lg shadow-inner mb-4">
-                    <img 
-                        // src="https://placehold.co/200x200?text=QR+Code" 
-                        src={`https://promptpay.io/${restPayment}/${totalPrice()}`} 
-                        alt="QR Code" 
-                        className="w-48 h-48 object-contain"
-                    />
-                </div>
+            <div className="flex flex-col items-center justify-center p-6 bg-white m-4 rounded-3xl shadow-sm border border-gray-100">
+              <p className="text-gray-500 font-bold mb-4 text-lg">สแกนเพื่อชำระเงิน</p>
+              
+              {/* Container ของรูป QR Code */}
+              <div className="p-3 bg-white rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.08)]">
+                  <img 
+                      src={`https://promptpay.io/${restPayment}/${totalPrice()}`} // URL ของ QR Code
+                      alt="PromptPay QR Code" 
+                      className="w-64 h-64 rounded-xl"
+                  />
+              </div>
 
-                <div className="mb-2">
-                    <span className="text-gray-600 font-medium">ยอดชำระ: </span>
-                    <span className="text-orange-600 font-bold text-xl">{totalPrice()} บาท</span>
-                </div>
-                
-                <p className="text-gray-500 text-sm">สแกน QR Code เพื่อชำระเงิน</p>
-                {/* <p className="text-gray-400 text-xs mt-1">รองรับ PromptPay, True Wallet, SCB Easy</p> */}
-            </div>
+              {/* === เพิ่มปุ่ม Download ตรงนี้ === */}
+              <button 
+                    onClick={handleDownloadQR}
+                    className="flex items-center gap-2 mt-4 px-5 py-2.5 bg-orange-50 text-orange-600 rounded-xl font-bold text-sm border border-orange-100 hover:bg-orange-100 transition-all active:scale-95 shadow-sm cursor-pointer"
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="7 10 12 15 17 10"></polyline>
+                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                    <span>บันทึก QR Code</span>
+                </button>
+                {/* ================================ */}
+
+          </div>
 
             {/* --- Card 2: Upload Slip Section --- */}
             <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
