@@ -1,7 +1,7 @@
 
 import { t } from "elysia";
 
-type OrderStatus =
+export type OrderStatus =
   | 'ordered'
   | 'cooking'
   | 'cooked'

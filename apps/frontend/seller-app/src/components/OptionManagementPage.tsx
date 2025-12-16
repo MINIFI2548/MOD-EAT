@@ -134,13 +134,13 @@ export default function OptionManagementPage() {
                     <input 
                         type="text" 
                         placeholder="ชื่อกลุ่มใหม่ (เช่น ไซส์แก้ว)" 
-                        className="border border-gray-300 rounded-lg px-4 py-2 w-full md:w-64 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                        className="border border-gray-300 rounded-lg px-4 py-2 w-full md:w-64 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500"
                         value={newGroupName}
                         onChange={(e) => setNewGroupName(e.target.value)}
                     />
                     <button 
                         onClick={handleAddGroup}
-                        className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg whitespace-nowrap font-medium"
+                        className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg whitespace-nowrap font-medium text-sm shadow-sm"
                     >
                         + สร้างกลุ่ม
                     </button>

@@ -13,7 +13,11 @@ export default function StorePage() {
 
     return (
         <div className="p-6 max-w-3xl mx-auto">
-            <h2 className="text-2xl font-bold text-gray-800 mb-6">ตั้งค่าร้านค้า</h2>
+            {/* Header Section */}
+            <div className="mb-6 border-b border-gray-100 pb-4">
+                <h2 className="text-2xl font-bold text-gray-800">ตั้งค่าร้านค้า</h2>
+                <p className="text-gray-500 text-sm">จัดการข้อมูลทั่วไปและสถานะร้าน</p>
+            </div>
 
             {/* 1. Shop Status (ย้ายมาจาก Dashboard) */}
             <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200 mb-6 flex justify-between items-center">

@@ -13,6 +13,7 @@
     "@elysiajs/eden": "^1.4.5",
     "@mod-eat/api-types": "workspace:*",
     "@tailwindcss/vite": "^4.1.17",
+    "date-fns": "^4.1.0",
     "elysia": "^1.4.16",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",

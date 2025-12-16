@@ -6,26 +6,21 @@ import {
 
 // --- Mock Data ---
 const hourlyData = [
-    { time: '10:00', sales: 500 },
-    { time: '11:00', sales: 1200 },
-    { time: '12:00', sales: 3500 }, // Peak
-    { time: '13:00', sales: 2800 },
-    { time: '14:00', sales: 1000 },
-    { time: '15:00', sales: 800 },
-    { time: '16:00', sales: 1500 },
+    { time: '10:00', sales: 0 },
+    { time: '11:00', sales: 0 },
+    { time: '12:00', sales: 0 }, // Peak
+    { time: '13:00', sales: 0 },
+    { time: '14:00', sales: 0 },
+    { time: '15:00', sales: 0 },
+    { time: '16:00', sales: 0 },
 ];
 
 const topMenuData = [
-    { name: 'กะเพราหมูสับ', quantity: 45 },
-    { name: 'ข้าวขาหมู', quantity: 32 },
-    { name: 'ต้มยำกุ้ง', quantity: 28 },
-    { name: 'ไข่เจียว', quantity: 20 },
-    { name: 'น้ำลำไย', quantity: 15 },
-];
+    { name: 'กระเพาหมูสับ', quantity: 0 },
+    { name: 'ข้าวขาหมู', quantity: 0 },
+    { name: 'ข้าวไข่เจียว', quantity: 0 },
+    { name: 'สุกกี้', quantity: 0 },
 
-const paymentData = [
-    { name: 'เงินสด', value: 3000 },
-    { name: 'QR Code', value: 7500 },
 ];
 
 const COLORS = ['#F97316', '#3B82F6']; // Orange-500, Blue-500
@@ -37,9 +32,13 @@ export default function SummaryPage() {
         <div className="p-6 pb-20 space-y-6">
             
             {/* Header & Filter */}
-            <div className="flex justify-between items-center">
-                <h2 className="text-2xl font-bold text-gray-800">สรุปยอดขาย</h2>
-                <div className="bg-white rounded-lg shadow-sm border p-1 flex">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+                <div>
+                    <h2 className="text-2xl font-bold text-gray-800">สรุปยอดขาย</h2>
+                    <p className="text-gray-500 text-sm">ภาพรวมรายได้และสถิติร้านค้า</p>
+                </div>
+                
+                <div className="bg-white rounded-lg shadow-sm border p-1 flex self-start md:self-auto">
                     {['today', 'week', 'month'].map((filter) => (
                         <button
                             key={filter}
@@ -57,15 +56,15 @@ export default function SummaryPage() {
             </div>
 
             {/* 1. KPI Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                <KPICard title="ยอดขายรวม" value="฿10,500" icon="💰" trend="+12%" isPositive={true} />
-                <KPICard title="จำนวนออเดอร์" value="140" icon="🧾" trend="+5%" isPositive={true} />
-                <KPICard title="เฉลี่ยต่อบิล" value="฿75" icon="⚖️" trend="-2%" isPositive={false} />
-                <KPICard title="รายการยกเลิก" value="3" icon="❌" subText="คิดเป็น 2.1%" />
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <KPICard title="ยอดขายรวม" value="฿135" icon="💰" trend="0" isPositive={true} />
+                <KPICard title="จำนวนออเดอร์" value="3" icon="🧾" trend="0" isPositive={true} />
+                <KPICard title="เฉลี่ยต่อบิล" value="฿45" icon="⚖️" trend="0" isPositive={true} />
+                {/* <KPICard title="รายการยกเลิก" value="3" icon="❌" subText="คิดเป็น 2.1%" /> */}
             </div>
 
             {/* 2. Charts Section */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-1 gap-6">
                 
                 {/* Main Graph: Hourly Sales */}
                 <div className="lg:col-span-2 bg-white p-6 rounded-xl shadow-sm border border-gray-100">

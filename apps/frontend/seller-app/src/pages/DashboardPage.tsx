@@ -6,6 +6,8 @@ import MenuPage from '../components/MenuPage';
 import OptionManagementPage from '../components/OptionManagementPage';
 import SummaryPage from '../components/SummaryPage';
 import StorePage from '../components/StorePage';
+import { data } from 'react-router';
+import { useRestaurantContext } from '../context/RestaurantContext';
 
 interface webSocketOrderUpdate{
     type : string, 
@@ -14,6 +16,15 @@ interface webSocketOrderUpdate{
 
 // Dashbaord นี้ไม่มีการ Import Fucntion ใด ๆ เข้ามาจากภายนอก
 export default function DashboardPage() {
+    const { setId } = useRestaurantContext()
+
+    useEffect(() => { 
+        api.seller.auth.verify.get()
+        .then(({data}) => {
+            setId(data?.id)
+            // console.log(data)
+        })
+    }, [])
 
     const [storeName, setStoreName] = useState('ร้านอาหาร');
     // const [orders, setOrders] = useState(ordersData.orders);
@@ -45,13 +56,14 @@ export default function DashboardPage() {
     // console.log(id, name)
     useEffect(()=> {
         const respone = localStorage.getItem('restaurant') 
-        console.log(respone)
+        // console.log(respone)
         setRestaurant(JSON.parse(JSON.stringify(respone)))
-        console.log(restaurant)  
+        // console.log(restaurant)  
+        // todo 
         const chat = api.seller.dashboard.subscribe({query:{restaurantId:'1'}})
         chat.subscribe(({data}) => {
             const res : webSocketOrderUpdate = data as webSocketOrderUpdate
-            console.log(data)
+            // console.log(data)
             if(res.type === "connect"){
                 setQueue(res.orderItems)
             }else if(res.type === "update"){
@@ -67,7 +79,7 @@ export default function DashboardPage() {
     }, [])
 
     useEffect(()=>{
-        console.log(queue)
+        // console.log(queue)
     }, [queue])
 
     //todo logout
@@ -88,8 +100,9 @@ export default function DashboardPage() {
     return (
         <div className="bg-orange-50 min-h-screen">
             {/* Header */}
-            <header className="bg-white shadow-sm border-b border-gray-200">
-                <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
+            {/* แก้ไข 1: เปลี่ยน max-w-7xl เป็น w-full และเพิ่ม px ตามขนาดจอ */}
+            <header className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-10">
+                <div className="w-full px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
                     <div>
                         <h1 className="text-2xl font-bold text-gray-800">
                             {storeName}
@@ -98,14 +111,14 @@ export default function DashboardPage() {
                     </div>
                     <button
                         onClick={handleLogout}
-                        className="text-orange-600 hover:text-orange-700 font-medium text-sm">
+                        className="text-orange-600 hover:text-orange-700 font-medium text-sm px-3 py-1 rounded hover:bg-orange-50 transition-colors">
                         ออกจากระบบ
                     </button>
                 </div>
             </header>
 
             {/* Main Container */}
-            <div className="max-w-7xl mx-auto px-4 py-6 Container">
+            <div className="mx-auto px-4 py-6 Container">
                 {/* Tab Navigation */}
                 <NavBar
                     activeTab={activeTab}

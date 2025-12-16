@@ -1,29 +1,25 @@
 // components/MenuPage.tsx
-import { useState } from 'react';
+import { api } from '@mod-eat/api-types';
+import { useEffect, useState } from 'react';
+import { useRestaurantContext } from '../context/RestaurantContext';
+import type { MenuItem } from '@mod-eat/api-types';
 
-// Define Type สำหรับ Menu Item
-interface MenuItem {
-    id: number;
-    name: string;
-    price: number;
-    category: string;
-    description: string;
-    isAvailable: boolean;
-    image?: string;
-}
-
-// Mock Data เริ่มต้น (เพื่อให้เห็นภาพ)
-const initialMenus: MenuItem[] = [
-    { id: 1, name: "กะเพราหมูสับ", price: 55, category: "อาหารจานเดียว", description: "เผ็ดร้อน ถึงเครื่อง", isAvailable: true },
-    { id: 2, name: "ข้าวผัดปู", price: 80, category: "อาหารจานเดียว", description: "เนื้อปูเน้นๆ", isAvailable: true },
-    { id: 3, name: "ต้มยำกุ้ง", price: 120, category: "กับข้าว", description: "กุ้งแม่น้ำตัวโต", isAvailable: false },
-    { id: 4, name: "น้ำลำไย", price: 25, category: "เครื่องดื่ม", description: "หวานเย็นชื่นใจ", isAvailable: true },
-];
 
 export default function MenuPage() {
-    const [menus, setMenus] = useState<MenuItem[]>(initialMenus);
+    const [menus, setMenus] = useState<MenuItem[]>([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingItem, setEditingItem] = useState<MenuItem | null>(null);
+    const { id } = useRestaurantContext()
+
+    useEffect(() => { 
+        api.seller.dashboard.menus.get({
+            query : {id : id}
+        })
+        .then(({data}) => {
+            // console.log(data)
+            setMenus(data)
+        })
+    }, [])
 
     // --- Actions ---
     
@@ -42,22 +38,31 @@ export default function MenuPage() {
     // ลบเมนู
     const handleDelete = (id: number) => {
         if (confirm("คุณต้องการลบเมนูนี้ใช่หรือไม่?")) {
-            setMenus(prev => prev.filter(m => m.id !== id));
+            setMenus(prev => prev.filter(m => m.menuId !== id));
         }
     };
 
     // เปลี่ยนสถานะ (มีของ / หมด)
     const handleToggleStatus = (id: number) => {
-        setMenus(prev => prev.map(m => 
-            m.id === id ? { ...m, isAvailable: !m.isAvailable } : m
-        ));
+    setMenus(prev =>
+        prev.map(m =>
+            m.menuId === id
+                ? {
+                    ...m,
+                    status: m.status === 'enable'
+                        ? 'disable'
+                        : 'enable'
+                  }
+                : m
+        )
+        );
     };
 
     // บันทึกข้อมูล (รับค่าจาก Modal)
     const handleSave = (item: MenuItem) => {
         if (editingItem) {
             // Update Existing
-            setMenus(prev => prev.map(m => m.id === item.id ? item : m));
+            setMenus(prev => prev.map(m => m.menuId === item.menuId ? item : m));
         } else {
             // Create New (Generate ID แบบง่ายๆ)
             const newItem = { ...item, id: Date.now() }; 
@@ -69,14 +74,14 @@ export default function MenuPage() {
     return (
         <div>
             {/* Header Section */}
-            <div className="flex justify-between items-center mb-6">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
                 <div>
-                    <h2 className="text-xl font-bold text-gray-800">จัดการเมนูอาหาร</h2>
-                    <p className="text-sm text-gray-500">ทั้งหมด {menus.length} รายการ</p>
+                    <h2 className="text-2xl font-bold text-gray-800">จัดการเมนูอาหาร</h2>
+                    <p className="text-sm text-gray-500">รายการอาหารทั้งหมด <span className="font-medium text-gray-700">{menus.length}</span> รายการ</p>
                 </div>
                 <button 
                     onClick={handleAddNew}
-                    className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 shadow-sm transition-colors"
+                    className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 shadow-sm transition-colors font-medium text-sm"
                 >
                     <span>+</span> เพิ่มเมนูใหม่
                 </button>
@@ -84,20 +89,20 @@ export default function MenuPage() {
 
             {/* Menu Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {menus.map((menu) => (
-                    <div key={menu.id} className={`bg-white border rounded-xl p-4 shadow-sm relative transition-all ${!menu.isAvailable ? 'opacity-75 bg-gray-50' : ''}`}>
+                {menus.map((menu, index) => (
+                    <div key={index} className={`bg-white border rounded-xl p-4 shadow-sm relative transition-all ${menu.status == 'disable' ? 'opacity-75 bg-gray-50' : ''}`}>
                         
                         {/* Status Badge */}
                         <div className="absolute top-4 right-4">
                             <button 
-                                onClick={() => handleToggleStatus(menu.id)}
+                                onClick={() => handleToggleStatus(menu.menuId)}
                                 className={`text-xs px-2 py-1 rounded-full border font-medium transition-colors ${
-                                    menu.isAvailable 
+                                    menu.status == "enable" 
                                     ? 'bg-green-100 text-green-700 border-green-200 hover:bg-green-200' 
                                     : 'bg-red-100 text-red-700 border-red-200 hover:bg-red-200'
                                 }`}
                             >
-                                {menu.isAvailable ? 'พร้อมขาย' : 'ของหมด'}
+                                {menu.status == "enable" ? 'พร้อมขาย' : 'ไม่หร้อมขาย'}
                             </button>
                         </div>
 
@@ -108,9 +113,9 @@ export default function MenuPage() {
                                 🍲
                             </div>
                             <div className="flex-1">
-                                <h3 className="font-bold text-gray-800 text-lg">{menu.name}</h3>
+                                <h3 className="font-bold text-gray-800 text-lg">{menu.menuName}</h3>
                                 <p className="text-orange-600 font-bold">฿{menu.price}</p>
-                                <p className="text-xs text-gray-500 mt-1">{menu.category}</p>
+                                {/* <p className="text-xs text-gray-500 mt-1">{menu.category}</p> */}
                             </div>
                         </div>
                         
@@ -127,7 +132,7 @@ export default function MenuPage() {
                                 ✏️ แก้ไข
                             </button>
                             <button 
-                                onClick={() => handleDelete(menu.id)}
+                                onClick={() => handleDelete(menu.menuId)}
                                 className="px-3 py-2 text-sm font-medium text-red-500 bg-red-50 hover:bg-red-100 rounded-lg transition-colors"
                             >
                                 🗑️ ลบ
