@@ -1,4 +1,12 @@
-const TabButton = ({ isActive, onClick, tabKey, icon, label }) => {
+type TabButtonProps = {
+    isActive: boolean;
+    onClick: (tabKey: string) => void;
+    tabKey: string;
+    icon: string;
+    label: string;
+};
+
+const TabButton = ({ isActive, onClick, tabKey, icon, label } : TabButtonProps) => {
 
     const classes = `
         px-6 py-4 text-sm font-medium flex items-center gap-2 border-b-2 
@@ -19,13 +27,15 @@ const TabButton = ({ isActive, onClick, tabKey, icon, label }) => {
     );
 };
 
-export default function NavBar({ activeTab, onNavClick }) {
+export default function NavBar({ activeTab , onNavClick } : {activeTab : string, onNavClick : (tabKey: string) => void}) {
 
     const tabs = [
         { key: 'orders', icon: '🍽️', label: 'คำสั่งซื้อ' },
         { key: 'menu', icon: '📋', label: 'จัดการเมนู' },
-        { key: 'stock', icon: '📦', label: 'จัดการสต็อก' },
+        { key: 'options', icon: '⚙️', label: 'จัดการตัวเลือก' }, 
+        // { key: 'stock', icon: '📦', label: 'จัดการสต็อก' },
         { key: 'sales', icon: '📈', label: 'สรุปยอดขาย' },
+        { key: 'store', icon: '🏠', label: 'จัดการร้านค้า' }
     ];
 
     return (

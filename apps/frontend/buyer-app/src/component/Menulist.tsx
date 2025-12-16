@@ -28,7 +28,12 @@ export default function Menulist(restaurantId : any) {
     
     return(
         <>
-            <h1 className="ml-[4%]" >เมนูอาหาร</h1>
+            <div className="flex items-center gap-3 ml-[4%] my-4">
+                <div className="w-1.5 h-7 bg-orange-500 rounded-full shadow-sm"></div>
+                <h1 className="text-xl font-bold text-gray-800 tracking-wide">
+                    รายการอาหาร
+                </h1>
+            </div>
             <div className="flex flex-col gap-4 ">
                 <div className="RestList flex flex-col gap-1 w-[96%] ml-[2%]">
                     {

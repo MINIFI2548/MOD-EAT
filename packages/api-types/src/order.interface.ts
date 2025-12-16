@@ -1,4 +1,12 @@
+
 import { t } from "elysia";
+
+type OrderStatus =
+  | 'ordered'
+  | 'cooking'
+  | 'cooked'
+  | 'received'
+  | 'cancel';
 
 interface Option{
     optionGroup : string, 
@@ -26,7 +34,7 @@ export interface OrderItem{
     selectedOption?: any, 
     quantity : number, 
     description?: string,
-    status?: string,
+    status?: OrderStatus,
     pictureUrl? : string
 }
 export interface Order{ 

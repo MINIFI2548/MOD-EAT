@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
-import { data, redirect, useNavigate  } from 'react-router-dom';
 import NavBar from '../components/NavBar';
 import OrderPage from '../components/OrderPage';
 import { api, type OrderItem } from '@mod-eat/api-types';
-import { useRestaurantContext } from '../context/RestaurantContext';
 import MenuPage from '../components/MenuPage';
+import OptionManagementPage from '../components/OptionManagementPage';
+import SummaryPage from '../components/SummaryPage';
+import StorePage from '../components/StorePage';
 
 interface webSocketOrderUpdate{
     type : string, 
@@ -69,17 +70,6 @@ export default function DashboardPage() {
         console.log(queue)
     }, [queue])
 
-    // start api 
-    // const callVerify = async () => {
-    //     await api.seller.auth.verify.get().
-    //     then((res) => {
-    //         const data = res.data as {success: boolean, message: string, id: number, name: string}
-    //         console.log(res.data)
-    //         setStoreName(data.name)
-    //     })
-    // }
-
-
     //todo logout
     const handleLogout = () => {
         // window.location.reload(false);
@@ -124,7 +114,6 @@ export default function DashboardPage() {
 
                 {/* Content Area */}
                 <div className="bg-white rounded-b-xl shadow-sm p-6">
-
                     {/* Content for 'คำสั่งซื้อ' (Orders) Tab */}
                     {activeTab === 'orders' && (
                         // <h1>ordre page</h1>
@@ -154,15 +143,22 @@ export default function DashboardPage() {
                         // />
                         <MenuPage />
                     )}
-
+                    {/* Content for 'จัดการตัวเลือก' (options) Tab */}
+                    {activeTab === 'options' && (
+                        <OptionManagementPage />
+                    )}
                     {/* Content for 'สรุปยอดขาย' (Sales) Tab */}
                     {activeTab === 'sales' && (
                         // <SummaryPage
                         //     summary={summary}
                         // />
-                        <h1>summary coming soon</h1>
+                        <SummaryPage /> 
                     )}
-
+                    {/* Content for 'สรุปยอดขาย' (Sales) Tab */}
+                    {activeTab === 'store' && (
+                        <StorePage /> 
+                    )}
+                    
                 </div>
             </div>
         </div>
