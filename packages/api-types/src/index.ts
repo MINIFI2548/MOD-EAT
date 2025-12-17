@@ -14,8 +14,8 @@ const hostname = isBrowser ? window.location.hostname : 'localhost';
 // สร้าง URL แบบ Dynamic
 // window.location.protocol = 'http:' หรือ 'https:'
 // window.location.hostname = 'localhost' หรือ '192.168.0.95'
+// const backendUrl = `${protocol}//${hostname}:${BACKEND_PORT}`;
 const backendUrl = `${protocol}//${hostname}:${BACKEND_PORT}`;
-
 export const api = treaty<AppSever>(backendUrl, {
     fetch:{
         credentials: 'include'

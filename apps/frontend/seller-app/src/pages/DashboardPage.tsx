@@ -6,7 +6,7 @@ import MenuPage from '../components/MenuPage';
 import OptionManagementPage from '../components/OptionManagementPage';
 import SummaryPage from '../components/SummaryPage';
 import StorePage from '../components/StorePage';
-import { data } from 'react-router';
+import { data, useNavigate } from 'react-router';
 import { useRestaurantContext } from '../context/RestaurantContext';
 
 interface webSocketOrderUpdate{
@@ -17,14 +17,7 @@ interface webSocketOrderUpdate{
 // Dashbaord นี้ไม่มีการ Import Fucntion ใด ๆ เข้ามาจากภายนอก
 export default function DashboardPage() {
     const { setId } = useRestaurantContext()
-
-    useEffect(() => { 
-        api.seller.auth.verify.get()
-        .then(({data}) => {
-            setId(data?.id)
-            // console.log(data)
-        })
-    }, [])
+    const navigate = useNavigate()
 
     const [storeName, setStoreName] = useState('ร้านอาหาร');
     // const [orders, setOrders] = useState(ordersData.orders);
@@ -49,6 +42,16 @@ export default function DashboardPage() {
     status: "ordered",
     description: ""
     }])
+
+    useEffect(() => { 
+        api.seller.auth.verify.get()
+        .then(({data}) => {
+            console.log(data)
+            setId(data?.id)
+            setStoreName(data?.name)
+        })
+    }, [])
+
 
     const handleTabClick = (tabKey : any) => {
         setActiveTab(tabKey);
@@ -84,17 +87,15 @@ export default function DashboardPage() {
 
     //todo logout
     const handleLogout = () => {
-        // window.location.reload(false);
-        // const confirmLogout = confirm('คุณต้องการออกจากระบบหรือไม่?');
-        // if (confirmLogout) {
-        //     localStorage.removeItem('isLoggedIn');
-        //     localStorage.removeItem('loggedInStore');
-        //     localStorage.removeItem('loggedInStoreName');
-        //     alert('ออกจากระบบสำเร็จ');
-
-        //     // จะใช่ Function นี้ก็ไป Import เข้ามาซะ ตอนนี้มีแค่ Mock Up อย่างเดียว
-        //     // onLogout();
-        // }
+        // window.location.reload();
+        api.seller.auth.logout.get()
+        navigate('/')
+        localStorage.removeItem('isLoggedIn');
+        localStorage.removeItem('loggedInStore');
+        localStorage.removeItem('loggedInStoreName');
+        // alert('ออกจากระบบสำเร็จ');
+        // จะใช่ Function นี้ก็ไป Import เข้ามาซะ ตอนนี้มีแค่ Mock Up อย่างเดียว
+        // onLogout();  
     };
 
     return (

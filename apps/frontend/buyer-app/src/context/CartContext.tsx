@@ -47,7 +47,7 @@ export const CartProvider = ({ children }: {children : ReactNode}) => {
     const increaseQuantity = (index: number) => {
         setCart((prev) => {
             const newCart = [...prev];
-            newCart[index].quantity += 1;
+            newCart[index].quantity += 0.5;
             return newCart;
         });
     };
@@ -56,7 +56,7 @@ export const CartProvider = ({ children }: {children : ReactNode}) => {
         setCart((prev) => {
             const newCart = [...prev];
             if (newCart[index].quantity > 1) {
-                newCart[index].quantity -= 1;
+                newCart[index].quantity -= 0.5;
             } else {
                 newCart.splice(index, 1); // ลบออกจาก Array
             }

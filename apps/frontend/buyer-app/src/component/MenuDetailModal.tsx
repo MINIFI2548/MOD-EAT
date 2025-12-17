@@ -8,11 +8,13 @@ interface MenuDetailModalProps {
   isEditing?: boolean;      // บอกว่าเป็นโหมดแก้ไขหรือไม่
   initialData?: any;        // ข้อมูลเดิมในตะกร้า (Selected Option, Note, Qty)
   onUpdate?: (updatedItem: any) => void; // ฟังก์ชัน callback เมื่อกดบันทึก
+  
 }
 
 interface OptionItem {
   name: string;
   price: number;
+  status?: string;
 }
 
 export default function MenuDetailModal({ menu, onClose, isEditing = false, initialData, onUpdate }: MenuDetailModalProps) {
@@ -117,27 +119,62 @@ export default function MenuDetailModal({ menu, onClose, isEditing = false, init
           {menu.options?.map((group: any, index: number) => (
             <div key={index} className="mb-6">
               <h3 className="font-bold text-lg text-gray-800 mb-2">{group.optionGroup}</h3>
-              <div className="flex flex-col gap-2">
-                {group.optionItems.map((item: OptionItem, idx: number) => {
-                  const isSelected = selections[group.optionGroup]?.name === item.name;
-                  return (
-                    <label key={idx} 
-                      className={`flex items-center justify-between p-3 rounded-xl border cursor-pointer transition-all ${
-                        isSelected ? 'border-orange-500 bg-orange-50/50' : 'border-gray-200'
-                      }`}
-                      onClick={() => handleSelectOption(group.optionGroup, item)}
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${isSelected ? 'border-orange-500' : 'border-gray-300'}`}>
-                          {isSelected && <div className="w-2.5 h-2.5 bg-orange-500 rounded-full"></div>}
-                        </div>
-                        <span className={isSelected ? 'text-gray-900 font-medium' : 'text-gray-600'}>{item.name}</span>
-                      </div>
-                      {item.price > 0 && <span className="text-gray-500 text-sm">+ ฿{item.price}</span>}
-                    </label>
-                  );
+                <div className="flex flex-col gap-2">
+                  {group.optionItems.map((item: OptionItem, idx: number) => {
+                    // เช็คสถานะของ Option (สมมติ API ส่ง status มาให้ใน item)
+                    // ถ้าไม่มี field status ให้แก้เป็น const isOptionDisabled = false; ไปก่อน
+                    const isOptionDisabled = item?.status === 'disable'; 
+                    const isSelected = selections[group.optionGroup]?.name === item.name;
+                    return (
+                        <label 
+                            key={idx} 
+                            className={`
+                                flex items-center justify-between p-3 rounded-xl border transition-all 
+                                ${isOptionDisabled 
+                                    ? 'bg-gray-100 border-gray-100 cursor-not-allowed opacity-60' // สไตล์ตัวเลือกที่หมด
+                                    : isSelected 
+                                        ? 'border-orange-500 bg-orange-50/50 cursor-pointer' 
+                                        : 'border-gray-200 hover:border-orange-200 cursor-pointer'
+                                }
+                            `}
+                            // ดักจับการคลิก
+                            onClick={(e) => {
+                                if (isOptionDisabled) {
+                                    e.preventDefault(); // ห้ามกด
+                                    e.stopPropagation();
+                                    return;
+                                }
+                                handleSelectOption(group.optionGroup, item);
+                            }}
+                        >
+                            <div className="flex items-center gap-3">
+                                {/* วงกลม Radio */}
+                                <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center 
+                                    ${isOptionDisabled ? 'border-gray-300 bg-gray-200' : // สีเทา
+                                      isSelected ? 'border-orange-500' : 'border-gray-300'}
+                                `}>
+                                    {isSelected && !isOptionDisabled && <div className="w-2.5 h-2.5 bg-orange-500 rounded-full"></div>}
+                                </div>
+                                
+                                {/* ชื่อตัวเลือก */}
+                                <span className={`
+                                    ${isOptionDisabled ? 'text-gray-400 line-through' : // ขีดฆ่าชื่อ
+                                      isSelected ? 'text-gray-900 font-medium' : 'text-gray-600'}
+                                `}>
+                                    {item.name} {isOptionDisabled && <span className="text-red-400 no-underline text-xs ml-1">(หมด)</span>}
+                                </span>
+                            </div>
+                            
+                            {/* ราคา */}
+                            {item.price > 0 && (
+                                <span className={`text-sm ${isOptionDisabled ? 'text-gray-300' : 'text-gray-500'}`}>
+                                    + ฿{item.price}
+                                </span>
+                            )}
+                        </label>
+                    );
                 })}
-              </div>
+                </div>
             </div>
           ))}
 

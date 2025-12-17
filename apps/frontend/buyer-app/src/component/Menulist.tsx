@@ -19,6 +19,7 @@ export default function Menulist({ restaurantId, onMenuClick }: MenulistProps) {
             query : { id : restaurantId }
         }).then((res) => {
             setMenuLists(res.data as MenuItem[])
+            console.log(res.data)
         })
     } 
 
@@ -26,6 +27,21 @@ export default function Menulist({ restaurantId, onMenuClick }: MenulistProps) {
         callMenu()
     }, [])
     
+    const sortedMenus = [...menuLists].sort((a, b) => {
+        // กฎ: ให้ 'enable' มาก่อน 'disable'
+        
+        // ถ้า a เป็น enable และ b เป็น disable -> a ขึ้นก่อน (-1)
+        if (a.status === 'enable' && b.status === 'disable') {
+            return -1;
+        }
+        // ถ้า a เป็น disable และ b เป็น enable -> b ขึ้นก่อน (1)
+        if (a.status === 'disable' && b.status === 'enable') {
+            return 1;
+        }
+        // ถ้าสถานะเหมือนกัน (เช่น enable ทั้งคู่ หรือ disable ทั้งคู่) ให้เรียงตามลำดับเดิม (0)
+        return 0;
+    });
+
     return(
         <>
             <div className="flex items-center gap-3 ml-[4%] my-4">
@@ -38,8 +54,8 @@ export default function Menulist({ restaurantId, onMenuClick }: MenulistProps) {
             <div className="flex flex-col gap-4 pb-20">
                 <div className="RestList flex flex-col gap-2 w-[96%] ml-[2%]">
                     {
-                        menuLists.map((menu, index) => { 
-                            if (menu.status == 'enable') { 
+                        sortedMenus.map((menu, index) => { 
+                            // if (menu.status == 'enable') { 
                                 return (
                                     <MenuCard 
                                         menu={menu} 
@@ -48,7 +64,7 @@ export default function Menulist({ restaurantId, onMenuClick }: MenulistProps) {
                                         onClick={(item) => onMenuClick(item)}
                                     />
                                 )
-                            }
+                            // }
                         })
                     }
                 </div>

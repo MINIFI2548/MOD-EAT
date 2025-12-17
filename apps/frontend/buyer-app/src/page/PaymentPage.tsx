@@ -52,13 +52,13 @@ export default function PaymentPage() {
     };
 
     const handleConfirm = () => {
+      // Validation เบื้องต้น
       if (!selectedFile) {
-        alert("กรุณาแนบสลิปการโอนเงิน");
+        toast.error("กรุณาแนบสลิปการโอนเงิน"); // เปลี่ยน alert เป็น toast เพื่อความสวยงาม
         return;
       }
-      // navigate("/"); // กลับหน้าแรก หรือไปหน้า Success
-      console.log(cart)
-
+      
+      // เตรียมข้อมูล Order Items
       const orderItems = cart.map((item : OrderCart) => {
       return {
           menuId: item.menuId,
@@ -72,7 +72,6 @@ export default function PaymentPage() {
           description: item.description || "" 
         }
       })
-      try{
         console.log(orderItems)
         api.buyer.order.create.post({
           
@@ -85,25 +84,28 @@ export default function PaymentPage() {
           
         }).then(({ data } : {data : any}) => {
           console.log(data)
-          if(data.status != "sucess"){
-            throw Error("bad slip")
+         // --- [ส่วนที่เพิ่มใหม่] เช็คสถานะ Fail ---
+          if (data.status === 'fail') {
+              // แจ้งเตือนสีแดง (Error) พร้อมข้อความจาก Backend (data.message)
+              toast.error(data.message || "การสั่งซื้อล้มเหลว กรุณาตรวจสอบสลิป");
+              return; // หยุดการทำงาน ไม่บันทึกลง history
           }
+          // -------------------------------------
+          
           let history = JSON.parse(localStorage?.getItem('historyOrder') ?? '[]')
           const orderLists : OrderItem[] = data.orderItems;
           history = [...history, ...orderLists]
-          console.log("history : ")
-          console.log(history)
+          // console.log("history : ")
+          // console.log(history)
           localStorage.setItem('historyOrder', JSON.stringify(history))
+          // แจ้งเตือนสำเร็จและเปลี่ยนหน้า
           toast.success("สั่งซื้อสำเร็จ!")
           navigate('/history')
         })
-        // TODO: ส่งข้อมูลไป Backend
-        // alert("ยืนยันการสั่งซื้อเรียบร้อย!");
-        }catch(err){
-          console.log(err)
-          alert(err)
-          
-        }
+        .catch((err) => {
+          console.error("API Error:", err)
+          toast.error("เกิดข้อผิดพลาดในการเชื่อมต่อกับเซิร์ฟเวอร์")
+        })
       }
 
       const handleDownloadQR = async () => {
