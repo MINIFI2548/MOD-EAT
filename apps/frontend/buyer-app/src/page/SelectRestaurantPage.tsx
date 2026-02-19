@@ -64,7 +64,7 @@ export default function SelectRestaurantPage() {
                             />
                         </div>
                         <h1 className="text-2xl font-bold tracking-wide shadow-black drop-shadow-md items-center">
-                            เลือกร้านของคุณ
+                            ร้านไหนดี
                         </h1>
                         {/* --- ส่วนที่เพิ่ม: ปุ่มประวัติการสั่งซื้อ (Position Absolute เพื่อไม่ให้ดัน Layout ตรงกลาง) --- */}
                         <button 

@@ -11,8 +11,8 @@
   ],
   "scripts": {
     "dev:backend": "bun run --filter backend dev",
-    "dev:buyer": "bun run --filter buyer-app dev",
-    "dev:seller": "bun run --filter seller-app dev",
+    "dev:buyer": "bun run --filter buyer dev",
+    "dev:seller": "bun run --filter seller dev",
     "dev:all": "bun run --filter '*' dev"
   },
   "devDependencies": {
